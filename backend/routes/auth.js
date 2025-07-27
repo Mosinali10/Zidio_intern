@@ -20,7 +20,7 @@ router.post("/register", async (req, res) => {
   }
 });
 
-// ✅ Login route
+// POST /api/login
 router.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
@@ -42,18 +42,22 @@ router.post("/login", async (req, res) => {
       { expiresIn: "2h" }
     );
 
-    // Hide password before sending back user
-    const { password, ...userWithoutPassword } = user.toObject();
+    // Convert user to object and remove password
+    const userObj = user.toObject();
+    delete userObj.password;
 
     res.status(200).json({
       message: "Login successful",
       token,
-      user: userWithoutPassword,
+      user: userObj,
     });
   } catch (err) {
     res.status(500).json({ message: "Login failed", error: err.message });
   }
 });
+
+module.exports = router;
+
 
 // ✅ Protected route
 router.get("/protected", verifyToken, (req, res) => {
